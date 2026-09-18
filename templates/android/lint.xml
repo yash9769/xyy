@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lint>
+    <!-- Baseline lint policy for every app generated from this template. Individual apps may add
+         narrowly-scoped, justified overrides in their own lint.xml — never disable a check here
+         globally without a documented reason. -->
+    <issue id="HardcodedText" severity="warning" />
+    <issue id="ContentDescription" severity="error" />
+    <issue id="UnusedResources" severity="warning" />
+    <issue id="Autofill" severity="ignore" />
+</lint>

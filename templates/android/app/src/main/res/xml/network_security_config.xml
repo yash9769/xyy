@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Template default: cleartext traffic disallowed everywhere. Apps built on this template that
+    genuinely need network access must still go through HTTPS only — this file should not need
+    to change unless a specific, reviewed exception is required (e.g. a local dev server), and
+    any such exception must be scoped to a single domain and documented in that app's
+    SECURITY_REVIEW.md, never applied cleartextTrafficPermitted="true" globally.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+</network-security-config>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Compose supplies the actual theme (see ui/theme/Theme.kt); this XML theme exists only
+         because Android requires a theme reference for the window/splash before Compose takes
+         over, and to set the launcher window background color. -->
+    <style name="Theme.AppFactoryTemplate" parent="android:Theme.Material.Light.NoActionBar" />
+</resources>

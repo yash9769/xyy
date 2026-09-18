@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Placeholder vector launcher icon: a plain circle. Every app generated from this template
+     MUST replace this with its own original icon before any store submission — never ship this
+     placeholder, and never copy a competitor's icon (see CLAUDE.md IP policy). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,29 A25,25 0 1 1 53.99,29 Z" />
+</vector>

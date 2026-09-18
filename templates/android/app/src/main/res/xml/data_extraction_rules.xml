@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    android:allowBackup="false" above means Android's automatic cloud backup never runs, so this
+    file has no practical effect today — it exists so that if a future app built on this template
+    deliberately opts into allowBackup="true", it inherits an explicit, reviewed rule set instead
+    of the OS default (which would back up the entire app-private storage, including any local
+    database, to the user's Google account without a specific decision to do so).
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+    </cloud-backup>
+</data-extraction-rules>
