@@ -1,0 +1,29 @@
+# Opportunity scoring weights (see factory/ARCHITECTURE.md and factory/scoring/).
+# Every dimension must be justified by evidence recorded in the opportunity's `evidence[]` array
+# or explicitly flagged as an assumption. No dimension is a black box.
+#
+# Score per dimension: 0-5. Weighted sum -> total. Thresholds below map total to recommended_action.
+# These weights are a starting hypothesis; revise once real opportunities have been scored and
+# outcomes are known.
+
+dimensions:
+  market_demand: 1.5
+  pain_intensity: 1.5
+  complaint_frequency: 1.0
+  monetization_potential: 1.0
+  differentiation_potential: 1.5
+  development_complexity: -1.0   # higher complexity subtracts from score
+  maintenance_complexity: -0.5
+  competition_intensity: -1.0
+  technical_risk: -1.0
+  policy_risk: -1.5              # policy risk weighted heavily: a killed app is a total loss
+  ip_risk: -1.5
+  infrastructure_cost: -0.5
+  retention_potential: 1.0
+
+# total possible range roughly -6.5 .. +21.5 given dimension scores of 0-5
+thresholds:
+  build: 14          # total >= 14 -> BUILD
+  research_more: 8   # 8 <= total < 14 -> RESEARCH_MORE
+  watch: 3           # 3 <= total < 8 -> WATCH
+  # total < 3 -> REJECT

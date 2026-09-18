@@ -1,0 +1,45 @@
+# Kill criteria hypotheses (see factory/ARCHITECTURE.md and factory/analytics/).
+# These are starting thresholds, not proven — revise once the portfolio has real data.
+# A recommendation to KILL requires the minimum observation window below; before that,
+# the worst allowed recommendation is WATCH, never KILL, regardless of early numbers.
+
+minimum_observation:
+  days_since_production_launch: 30
+  minimum_installs_for_signal: 100
+
+signals:
+  insufficient_acquisition:
+    metric: installs_per_day_avg
+    threshold: 1
+    window_days: 30
+    note: "fewer than 1 install/day sustained over 30 days after launch, with no active marketing push"
+
+  negligible_retention:
+    metric: day_7_retention_pct
+    threshold: 5
+    note: "below 5% D7 retention for a utility app suggests no repeat value"
+
+  no_meaningful_revenue:
+    metric: revenue_monthly_usd
+    threshold: 0
+    applies_if: monetization != "free"
+    note: "monetized app producing $0 after 60 days despite adequate installs"
+
+  high_support_burden:
+    metric: negative_review_rate_pct
+    threshold: 30
+    note: "share of 1-2 star reviews exceeding 30% signals a broken core experience, not just noise"
+
+  technical_instability:
+    metric: crash_free_users_pct
+    threshold: 95
+    note: "below 95% crash-free users (Play Vitals bad-behavior threshold) is a stability kill signal"
+
+  policy_risk_realized:
+    metric: policy_strike_count
+    threshold: 1
+    note: "any confirmed Play policy strike triggers immediate re-evaluation, not just scoring"
+
+action_on_kill_candidate:
+  - "never auto-kill: always requires human review per appfactory iterate <id>"
+  - "document decision and evidence in reports/<id>/monitoring-<date>.md before moving app-manifest.json lifecycle_status to KILLED"

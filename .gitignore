@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+
+# Secrets — never commit these
+.env
+*.keystore
+*.jks
+service-account*.json
+
+# Android build output (once templates/apps exist)
+.gradle/
+build/
+*.apk
+*.aab
+local.properties
+
+# OS
+.DS_Store

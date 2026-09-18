@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/yash9769/xyy/schemas/research-record.schema.json",
+  "title": "Competitor Research Record",
+  "description": "One record per competitor app studied for a given opportunity. Every field distinguishes verified fact from inference/estimate/opinion via the `confidence` map.",
+  "type": "object",
+  "required": ["app_name", "opportunity_id", "source_url", "captured_at"],
+  "properties": {
+    "app_name": { "type": "string" },
+    "developer": { "type": "string" },
+    "opportunity_id": { "type": "string" },
+    "category": { "type": "string" },
+    "rating": { "type": "number", "minimum": 0, "maximum": 5 },
+    "review_count": { "type": "integer" },
+    "download_range": { "type": "string", "description": "e.g. '1M+' as shown on the store listing, not an invented number" },
+    "pricing": { "type": "string" },
+    "subscription_structure": { "type": "string" },
+    "has_ads": { "type": "boolean" },
+    "key_features": { "type": "array", "items": { "type": "string" } },
+    "visible_ux_patterns": { "type": "array", "items": { "type": "string" } },
+    "recurring_complaints": { "type": "array", "items": { "type": "string" } },
+    "recurring_praise": { "type": "array", "items": { "type": "string" } },
+    "user_requested_features": { "type": "array", "items": { "type": "string" } },
+    "target_demographic": { "type": "string" },
+    "localization": { "type": "array", "items": { "type": "string" } },
+    "update_frequency": { "type": "string" },
+    "apparent_positioning": { "type": "string" },
+    "confidence": {
+      "type": "object",
+      "description": "map of field name -> VERIFIED_FACT|INFERRED|ESTIMATE|OPINION, for every non-obvious field above",
+      "additionalProperties": { "type": "string", "enum": ["VERIFIED_FACT", "INFERRED", "ESTIMATE", "OPINION"] }
+    },
+    "source_url": { "type": "string" },
+    "captured_at": { "type": "string", "format": "date-time" }
+  }
+}

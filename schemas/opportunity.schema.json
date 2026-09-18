@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/yash9769/xyy/schemas/opportunity.schema.json",
+  "title": "Opportunity",
+  "description": "A normalized app-opportunity record tracked from candidate through approval/rejection.",
+  "type": "object",
+  "required": ["id", "category", "problem", "target_user", "proposed_solution", "differentiation", "status", "created_at", "updated_at"],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "description": "stable slug, e.g. unit-converter-offline" },
+    "category": { "type": "string" },
+    "problem": { "type": "string", "description": "the underlying user problem, not a feature list" },
+    "target_user": { "type": "string" },
+    "existing_products": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "names of competitor apps studied; details live in research/<id>/*.json"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claim", "type"],
+        "properties": {
+          "claim": { "type": "string" },
+          "source_url": { "type": "string" },
+          "type": { "type": "string", "enum": ["VERIFIED_FACT", "INFERRED", "ESTIMATE", "OPINION"] }
+        }
+      },
+      "description": "every non-trivial claim elsewhere in this record should be backed by an entry here"
+    },
+    "complaints": { "type": "array", "items": { "type": "string" } },
+    "requested_features": { "type": "array", "items": { "type": "string" } },
+    "proposed_solution": { "type": "string" },
+    "differentiation": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "must state genuine differentiation, not superficial changes (see IP/copying policy)"
+    },
+    "monetization": { "type": "string", "enum": ["free", "ads", "one_time_purchase", "subscription", "freemium", "unknown"] },
+    "estimated_build_days": { "type": "number", "minimum": 0 },
+    "backend_required": { "type": "boolean" },
+    "ip_risk": { "type": "string", "enum": ["low", "medium", "high"] },
+    "policy_risk": { "type": "string", "enum": ["low", "medium", "high"] },
+    "technical_risk": { "type": "string", "enum": ["low", "medium", "high"] },
+    "market_signal": { "type": "string", "enum": ["weak", "moderate", "strong"] },
+    "status": {
+      "type": "string",
+      "enum": ["candidate", "researching", "build", "research_more", "watch", "rejected", "approved"]
+    },
+    "score": {
+      "type": "object",
+      "description": "populated by factory/scoring/ — see factory/config/scoring-weights.yaml for the rubric",
+      "properties": {
+        "total": { "type": "number" },
+        "dimensions": {
+          "type": "object",
+          "additionalProperties": { "type": "number" }
+        },
+        "recommended_action": { "type": "string", "enum": ["BUILD", "RESEARCH_MORE", "WATCH", "REJECT"] },
+        "reasoning": { "type": "string" }
+      }
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  }
+}

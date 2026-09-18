@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/yash9769/xyy/schemas/app-manifest.schema.json",
+  "title": "App Manifest",
+  "description": "Portfolio record for one generated app, living at apps/<id>/app-manifest.json.",
+  "type": "object",
+  "required": ["id", "opportunity_id", "package_id", "stack", "lifecycle_status", "created_at", "updated_at"],
+  "properties": {
+    "id": { "type": "string" },
+    "opportunity_id": { "type": "string" },
+    "package_id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$" },
+    "app_name": { "type": "string" },
+    "stack": { "type": "string", "enum": ["kotlin-compose", "flutter", "react-native"] },
+    "version_name": { "type": "string" },
+    "version_code": { "type": "integer" },
+    "lifecycle_status": {
+      "type": "string",
+      "enum": ["IDEA", "RESEARCH", "APPROVED", "BUILDING", "QA", "READY", "INTERNAL", "CLOSED_TEST", "PRODUCTION", "ITERATING", "PAUSED", "KILLED"]
+    },
+    "launch_date": { "type": ["string", "null"], "format": "date" },
+    "repository_path": { "type": "string", "description": "relative path, e.g. apps/unit-converter-offline" },
+    "metrics_snapshot_ref": { "type": "string", "description": "path to latest reports/<id>/monitoring-*.md" },
+    "known_bugs": { "type": "array", "items": { "type": "string" } },
+    "development_cost_hours": { "type": "number" },
+    "infrastructure_cost_monthly_usd": { "type": "number" },
+    "revenue_monthly_usd": { "type": "number" },
+    "health_status": { "type": "string", "enum": ["healthy", "watch", "at_risk", "kill_candidate"] },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  }
+}
