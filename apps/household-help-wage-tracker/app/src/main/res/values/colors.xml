@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Distinct from the template's placeholder blue — a money/ledger-appropriate green,
+         still a placeholder pending real icon design before store submission. -->
+    <color name="ic_launcher_background">#1B5E3A</color>
+</resources>

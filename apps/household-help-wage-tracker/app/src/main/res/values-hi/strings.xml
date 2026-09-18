@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App name intentionally kept as "Hisaab" (already a Hindi/Urdu word) in both locales.
+         Full in-app string translation (screen labels, buttons) is tracked as a known Phase 1
+         limitation in the release-candidate report: this file demonstrates the values-hi
+         mechanism is wired up (locale switch + resource qualifier), but most UI strings in this
+         MVP are still hardcoded in Kotlin (see SECURITY_REVIEW.md / release-candidate report for
+         why, and FEATURES.md for the fix scope). -->
+    <string name="app_name">हिसाब</string>
+</resources>

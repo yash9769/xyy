@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Defense in depth: the app requests no INTERNET permission, so no network call is even
+     possible, but this additionally blocks cleartext traffic outright should that ever change. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+</network-security-config>

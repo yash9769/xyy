@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- allowBackup="false" above means this has no practical effect today; kept explicit in case a
+     future version enables OS-level backup, so it would not silently include the local database. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+    </cloud-backup>
+</data-extraction-rules>
