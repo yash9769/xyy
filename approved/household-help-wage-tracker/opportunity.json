@@ -1,0 +1,69 @@
+{
+  "id": "household-help-wage-tracker",
+  "category": "utilities/household-finance",
+  "problem": "Households paying part-time domestic help informally (notebook/memory) have month-end disputes over days worked and wages owed, with the leading app in this niche drifting from offline-only toward requiring a Google account",
+  "target_user": "Urban/semi-urban Indian households employing part-time domestic staff (maid/cook/driver), managed by the household budget-keeper",
+  "existing_products": [
+    "ServiceBook - Maid, Staff & Milk Attendance (com.lokeshjain.servicebook)",
+    "MaidExpense (com.imars.maidexpense)",
+    "Homemaid (com.homemaid.app)",
+    "MaidCircle (iOS only)"
+  ],
+  "evidence": [
+    {
+      "claim": "ServiceBook is free, tracks attendance (Hajiri) and advances (Udhari), auto-calculates salary, and markets itself as fully offline",
+      "source_url": "https://play.google.com/store/apps/details?id=com.lokeshjain.servicebook&hl=en_IN",
+      "type": "VERIFIED_FACT"
+    },
+    {
+      "claim": "ServiceBook version 3.1.3 added 'Smart Cloud Backup' via Google Sign-In, moving away from its original no-cloud posture",
+      "source_url": "https://play.google.com/store/apps/details?id=com.lokeshjain.servicebook&hl=en_IN",
+      "type": "VERIFIED_FACT"
+    },
+    {
+      "claim": "MaidCircle (iOS) implements attendance -> auto salary calculation, advances/loans tracking, and digital payment history, but has limited reviews",
+      "source_url": "https://apps.apple.com/us/app/maidcircle-attendance-tracker/id6753840155",
+      "type": "INFERRED"
+    },
+    {
+      "claim": "Homemaid handles overtime, days worked, vacations, absences, and monthly payments for domestic employees",
+      "source_url": "https://play.google.com/store/apps/details?id=com.homemaid.app&hl=en_IN",
+      "type": "VERIFIED_FACT"
+    },
+    {
+      "claim": "No competitor found in this search advertises a Hindi/regional-language UI or a continuous mid-month running-balance view; all appear to calculate salary at month-end only",
+      "source_url": "https://play.google.com/store/apps/details?id=com.lokeshjain.servicebook&hl=en_IN",
+      "type": "INFERRED"
+    },
+    {
+      "claim": "A closely related niche (offline, no-account, no-ads bill splitting) is already served by at least 7 established Google Play competitors, one with 100,000+ installs",
+      "source_url": "https://play.google.com/store/apps/details?id=com.splital.project",
+      "type": "VERIFIED_FACT"
+    }
+  ],
+  "complaints": [
+    "INFERRED: month-end disputes over exact days worked/amount owed when tracking is informal (notebook/memory) \u2014 the entire premise every competitor in this niche is independently built to solve",
+    "VERIFIED_FACT: the category's most visible incumbent now asks for a Google account for its newer backup feature, despite marketing itself as offline/private"
+  ],
+  "requested_features": [
+    "ESTIMATE: regional-language (Hindi) UI \u2014 inferred from target-user demographics, not from a specific user request found in research",
+    "ESTIMATE: a running/continuous balance rather than an end-of-month-only calculation"
+  ],
+  "proposed_solution": "A small offline-only Android app ('Hisaab') for tracking one or more household staff members' daily attendance, advances, and a continuously up-to-date wage balance, with a Hindi/English toggle and zero account requirement enforced by never requesting the INTERNET permission.",
+  "differentiation": [
+    "No INTERNET permission requested at all \u2014 a technically verifiable no-account, no-cloud guarantee, directly answering the trust gap opened by the leading competitor's move to Google Sign-In",
+    "Continuous mid-month running balance view instead of end-of-month-only calculation",
+    "Hindi + English UI toggle from v1, addressing a localization gap no found competitor advertises",
+    "Local file export/import for backup, preserving user convenience without a cloud account"
+  ],
+  "monetization": "free",
+  "estimated_build_days": 5,
+  "backend_required": false,
+  "ip_risk": "low",
+  "policy_risk": "low",
+  "technical_risk": "low",
+  "market_signal": "moderate",
+  "status": "approved",
+  "created_at": "2026-09-18T21:19:26.538257+00:00",
+  "updated_at": "2026-09-18T21:31:56.435199+00:00"
+}
