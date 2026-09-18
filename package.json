@@ -1,0 +1,15 @@
+{
+  "name": "app-factory",
+  "version": "0.1.0",
+  "private": true,
+  "description": "App Factory control plane — dashboard and shared service layer over the file-based factory state.",
+  "scripts": {
+    "dashboard": "node factory/dashboard/server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

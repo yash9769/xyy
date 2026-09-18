@@ -50,6 +50,8 @@ def build_parser() -> argparse.ArgumentParser:
     p_status = sub.add_parser("status", help="show lifecycle state of one or all opportunities/apps")
     p_status.add_argument("id", nargs="?", default=None)
 
+    sub.add_parser("dashboard", help="launch the App Factory Dashboard (http://localhost:4177)")
+
     return parser
 
 
@@ -69,6 +71,8 @@ def main(argv: list[str] | None = None) -> int:
         print(pipeline.cmd_status(args.id))
     elif args.command in {"spec", "build", "test", "review", "release", "publish", "monitor", "iterate"}:
         print(pipeline.cmd_stub(args.command, args.id))
+    elif args.command == "dashboard":
+        print(pipeline.cmd_dashboard())
     else:
         parser.print_help()
         return 1

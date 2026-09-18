@@ -1,0 +1,37 @@
+{
+  "appId": "household-help-wage-tracker",
+  "appName": "Hisaab",
+  "lifecycle_state": "RELEASE_CANDIDATE",
+  "stages": {
+    "product_spec": "done",
+    "ux": "done",
+    "implementation": "done",
+    "unit_tests": "partial",
+    "ui_tests": "not_run",
+    "security_review": "done",
+    "release_build": "blocked"
+  },
+  "build_status": "NOT_BUILT",
+  "test_status": "PARTIAL — 13/13 core logic tests passed outside Gradle (WageCalculator 8/8, BackupManager 5/5); Compose UI/Room/lint not run",
+  "security_status": "Source-level review complete — no secrets, zero permissions declared, no exported attack surface beyond launcher activity",
+  "blockers": [
+    {
+      "severity": "CRITICAL",
+      "description": "dl.google.com blocked by this environment's egress policy — AGP/AndroidX/Compose/Room cannot be resolved by Gradle, so no build was possible",
+      "reference": "factory/ANDROID_TOOLCHAIN.md"
+    },
+    {
+      "severity": "MEDIUM",
+      "description": "Full UI string externalization for Hindi not complete",
+      "reference": "reports/household-help-wage-tracker-release-candidate.md"
+    },
+    {
+      "severity": "MEDIUM",
+      "description": "Placeholder launcher icon needs real design before store submission",
+      "reference": "reports/household-help-wage-tracker-release-candidate.md"
+    }
+  ],
+  "release_candidate_report": "reports/household-help-wage-tracker-release-candidate.md",
+  "last_updated": "2026-09-18T22:00:00.000Z",
+  "note": "This status.json is a static, hand-verified snapshot transcribed from the real Phase 1 outputs (release-candidate report, security review, test run) for the dashboard to display. It is not a live build agent — no automated process updates this file yet (Phase B)."
+}

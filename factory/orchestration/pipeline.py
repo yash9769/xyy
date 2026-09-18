@@ -1,125 +1,20 @@
-"""Pipeline state machine backing the `appfactory` CLI.
+"""Pipeline commands backing the `appfactory` CLI.
 
-Phase 1 (see factory/ROADMAP.md) implements `discover`, `approve`, and `status` for
-real, file-based operation. Every other command is a clearly-labeled stub that
-names the roadmap phase where it becomes real, rather than pretending to work.
+As of the dashboard introduction, `discover`/`approve`/`reject`/`status` are thin wrappers around
+`factory/dashboard/lib/cli.js` — the Node service layer is the single implementation of the state
+machine and file I/O (see factory/dashboard/lib/stateMachine.js). This file must NOT reimplement
+that logic; if you need a new state-mutating command, add it to cli.js first, then call it from
+here. This keeps the CLI and the dashboard from ever disagreeing about what a legal transition is.
 """
 from __future__ import annotations
 
 import json
-import re
-import shutil
-from datetime import datetime, timezone
+import subprocess
+import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-CANDIDATES_DIR = REPO_ROOT / "candidates"
-APPROVED_DIR = REPO_ROOT / "approved"
-REJECTED_DIR = REPO_ROOT / "rejected"
-APPS_DIR = REPO_ROOT / "apps"
-
-
-def _now() -> str:
-    return datetime.now(timezone.utc).isoformat()
-
-
-def _slugify(text: str) -> str:
-    slug = re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
-    return slug or "unnamed-opportunity"
-
-
-def _write_json(path: Path, data: dict) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, indent=2, sort_keys=False) + "\n")
-
-
-def _read_json(path: Path) -> dict:
-    return json.loads(path.read_text())
-
-
-def cmd_discover(problem: str, category: str, target_user: str) -> str:
-    """Scaffold a new candidate opportunity record. Real research/scoring is manual
-    until Phase 2 automates it (factory/ROADMAP.md)."""
-    opp_id = _slugify(problem if len(problem) < 60 else category)
-    opp_dir = CANDIDATES_DIR / opp_id
-    if opp_dir.exists():
-        return f"Candidate '{opp_id}' already exists at {opp_dir.relative_to(REPO_ROOT)}"
-
-    record = {
-        "id": opp_id,
-        "category": category,
-        "problem": problem,
-        "target_user": target_user,
-        "existing_products": [],
-        "evidence": [],
-        "complaints": [],
-        "requested_features": [],
-        "proposed_solution": "",
-        "differentiation": [],
-        "monetization": "unknown",
-        "estimated_build_days": 0,
-        "backend_required": False,
-        "ip_risk": "low",
-        "policy_risk": "low",
-        "technical_risk": "low",
-        "market_signal": "weak",
-        "status": "candidate",
-        "created_at": _now(),
-        "updated_at": _now(),
-    }
-    _write_json(opp_dir / "opportunity.json", record)
-    (opp_dir / "research").mkdir(exist_ok=True)
-    return (
-        f"Created candidate '{opp_id}' at {opp_dir.relative_to(REPO_ROOT)}/opportunity.json\n"
-        f"Next: fill in evidence/existing_products/complaints, then run `appfactory analyze {opp_id}`."
-    )
-
-
-def cmd_analyze(opp_id: str) -> str:
-    return (
-        f"[stub] `analyze {opp_id}` is a Phase 2 capability (factory/ROADMAP.md).\n"
-        f"For now: manually research competitors into candidates/{opp_id}/research/, "
-        f"score by hand against factory/config/scoring-weights.yaml, and write "
-        f"reports/{opp_id}/opportunity-report.md before running `appfactory approve {opp_id}`."
-    )
-
-
-def cmd_approve(opp_id: str) -> str:
-    """GATE 1 — human approval. Moves candidates/<id> -> approved/<id>."""
-    src = CANDIDATES_DIR / opp_id
-    if not src.exists():
-        return f"No such candidate: {opp_id} (looked in {src.relative_to(REPO_ROOT)})"
-    dest = APPROVED_DIR / opp_id
-    if dest.exists():
-        return f"'{opp_id}' is already approved at {dest.relative_to(REPO_ROOT)}"
-
-    opp_path = src / "opportunity.json"
-    record = _read_json(opp_path)
-    record["status"] = "approved"
-    record["updated_at"] = _now()
-    _write_json(opp_path, record)
-
-    shutil.move(str(src), str(dest))
-    return (
-        f"GATE 1 passed: '{opp_id}' moved to {dest.relative_to(REPO_ROOT)}.\n"
-        f"Next: `appfactory spec {opp_id}` (Phase 1/2) to generate PRD/UX docs."
-    )
-
-
-def cmd_reject(opp_id: str, reason: str) -> str:
-    src = CANDIDATES_DIR / opp_id
-    if not src.exists():
-        return f"No such candidate: {opp_id}"
-    dest = REJECTED_DIR / opp_id
-    opp_path = src / "opportunity.json"
-    record = _read_json(opp_path)
-    record["status"] = "rejected"
-    record["updated_at"] = _now()
-    record.setdefault("score", {})["reasoning"] = reason
-    _write_json(opp_path, record)
-    shutil.move(str(src), str(dest))
-    return f"'{opp_id}' rejected and moved to {dest.relative_to(REPO_ROOT)}."
-
+CLI_BRIDGE = REPO_ROOT / "factory" / "dashboard" / "lib" / "cli.js"
 
 _STUB_PHASES = {
     "spec": "Phase 1/2",
@@ -133,6 +28,73 @@ _STUB_PHASES = {
 }
 
 
+def _run_bridge(*args: str) -> dict:
+    """Invoke the Node CLI bridge and parse its single-line JSON response. Raises RuntimeError
+    with the bridge's own error message on failure (e.g. an invalid state transition) — never
+    silently swallowed."""
+    result = subprocess.run(
+        ["node", str(CLI_BRIDGE), *args],
+        capture_output=True,
+        text=True,
+        cwd=REPO_ROOT,
+    )
+    output = result.stdout.strip() or result.stderr.strip()
+    try:
+        data = json.loads(output)
+    except json.JSONDecodeError:
+        raise RuntimeError(f"Unexpected output from dashboard service layer: {output}")
+    if "error" in data:
+        raise RuntimeError(data["error"])
+    return data
+
+
+def cmd_discover(problem: str, category: str, target_user: str) -> str:
+    try:
+        data = _run_bridge(
+            "discover",
+            "--problem", problem,
+            "--category", category,
+            "--target-user", target_user,
+        )
+    except RuntimeError as e:
+        return f"Error: {e}"
+    return (
+        f"Created candidate '{data['id']}' at {data['dir']}/opportunity.json "
+        f"(lifecycle_state={data['lifecycle_state']})\n"
+        f"Next: fill in evidence/existing_products/complaints, then review it in the dashboard "
+        f"(`npm run dashboard`) or run `appfactory approve {data['id']}`."
+    )
+
+
+def cmd_analyze(opp_id: str) -> str:
+    return (
+        f"[stub] `analyze {opp_id}` is a Phase 2 capability (factory/ROADMAP.md).\n"
+        f"For now: manually research competitors into candidates/{opp_id}/research/, "
+        f"score by hand against factory/config/scoring-weights.yaml, and write "
+        f"reports/{opp_id}/opportunity-report.md before approving it."
+    )
+
+
+def cmd_approve(opp_id: str) -> str:
+    """GATE 1 — human approval. Equivalent to clicking Approve in the dashboard."""
+    try:
+        data = _run_bridge("transition", opp_id, "APPROVE_OPPORTUNITY", "--actor", "HUMAN")
+    except RuntimeError as e:
+        return f"Error: {e}"
+    return f"GATE 1 passed: '{opp_id}' is now {data['opportunity']['lifecycle_state']}."
+
+
+def cmd_reject(opp_id: str, reason: str) -> str:
+    try:
+        data = _run_bridge(
+            "transition", opp_id, "REJECT_OPPORTUNITY",
+            "--actor", "HUMAN", "--note", reason,
+        )
+    except RuntimeError as e:
+        return f"Error: {e}"
+    return f"'{opp_id}' rejected (state={data['opportunity']['lifecycle_state']})."
+
+
 def cmd_stub(command: str, opp_id: str) -> str:
     phase = _STUB_PHASES.get(command, "a future phase")
     return (
@@ -142,37 +104,26 @@ def cmd_stub(command: str, opp_id: str) -> str:
 
 
 def cmd_status(opp_id: str | None = None) -> str:
-    lines: list[str] = []
-    for label, directory in (
-        ("candidate", CANDIDATES_DIR),
-        ("approved", APPROVED_DIR),
-        ("rejected", REJECTED_DIR),
-    ):
-        if not directory.exists():
-            continue
-        for entry in sorted(directory.iterdir()):
-            if not entry.is_dir():
-                continue
-            if opp_id and entry.name != opp_id:
-                continue
-            opp_file = entry / "opportunity.json"
-            status = "unknown"
-            if opp_file.exists():
-                status = _read_json(opp_file).get("status", "unknown")
-            lines.append(f"{entry.name:35s} {label:10s} status={status}")
+    try:
+        data = _run_bridge("status", *([opp_id] if opp_id else []))
+    except RuntimeError as e:
+        return f"Error: {e}"
 
-    if APPS_DIR.exists():
-        for entry in sorted(APPS_DIR.iterdir()):
-            if not entry.is_dir():
-                continue
-            if opp_id and entry.name != opp_id:
-                continue
-            manifest_file = entry / "app-manifest.json"
-            lifecycle = "unknown"
-            if manifest_file.exists():
-                lifecycle = _read_json(manifest_file).get("lifecycle_status", "unknown")
-            lines.append(f"{entry.name:35s} {'app':10s} lifecycle={lifecycle}")
+    if opp_id:
+        return json.dumps(data, indent=2)
+
+    lines: list[str] = []
+    for opp in data.get("opportunities", []):
+        lines.append(f"{opp['id']:40s} opportunity  state={opp.get('lifecycle_state', 'UNKNOWN')}")
+    for app in data.get("apps", []):
+        lines.append(f"{app.get('appId', '?'):40s} app          state={app.get('lifecycle_state', 'UNKNOWN')}")
 
     if not lines:
         return "No opportunities or apps found yet. Run `appfactory discover` to create the first one."
     return "\n".join(lines)
+
+
+def cmd_dashboard() -> str:
+    """Launch the dashboard server (blocking) — same as `npm run dashboard`."""
+    subprocess.run(["npm", "run", "dashboard"], cwd=REPO_ROOT)
+    return ""

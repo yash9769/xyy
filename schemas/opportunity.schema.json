@@ -4,7 +4,7 @@
   "title": "Opportunity",
   "description": "A normalized app-opportunity record tracked from candidate through approval/rejection.",
   "type": "object",
-  "required": ["id", "category", "problem", "target_user", "proposed_solution", "differentiation", "status", "created_at", "updated_at"],
+  "required": ["id", "category", "problem", "target_user", "proposed_solution", "differentiation", "lifecycle_state", "created_at", "updated_at"],
   "properties": {
     "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "description": "stable slug, e.g. unit-converter-offline" },
     "category": { "type": "string" },
@@ -44,10 +44,23 @@
     "policy_risk": { "type": "string", "enum": ["low", "medium", "high"] },
     "technical_risk": { "type": "string", "enum": ["low", "medium", "high"] },
     "market_signal": { "type": "string", "enum": ["weak", "moderate", "strong"] },
-    "status": {
+    "lifecycle_state": {
       "type": "string",
-      "enum": ["candidate", "researching", "build", "research_more", "watch", "rejected", "approved"]
+      "description": "the formal factory state machine's current state — see factory/dashboard/lib/stateMachine.js, the single source of truth for valid states and transitions",
+      "enum": [
+        "DISCOVERED", "RESEARCHING", "RESEARCH_COMPLETE", "AWAITING_OPPORTUNITY_APPROVAL",
+        "REJECTED", "APPROVED", "SPEC_GENERATING", "AWAITING_SPEC_APPROVAL", "BUILDING",
+        "TESTING", "SECURITY_REVIEW", "RELEASE_CANDIDATE", "AWAITING_RELEASE_APPROVAL",
+        "INTERNAL_TEST", "AWAITING_PRODUCTION_APPROVAL", "PUBLISHED", "MONITORING",
+        "ITERATION_PROPOSED", "PAUSED", "KILLED"
+      ]
     },
+    "rejection_reason": {
+      "type": "string",
+      "description": "set when lifecycle_state is REJECTED",
+      "enum": ["weak_demand", "too_competitive", "poor_monetization", "too_difficult", "policy_risk", "ip_risk", "not_interesting", "other"]
+    },
+    "rejection_note": { "type": "string", "description": "free-text detail accompanying rejection_reason" },
     "score": {
       "type": "object",
       "description": "populated by factory/scoring/ — see factory/config/scoring-weights.yaml for the rubric",

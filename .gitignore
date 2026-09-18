@@ -2,6 +2,10 @@
 __pycache__/
 *.pyc
 
+# Node (dashboard)
+node_modules/
+npm-debug.log*
+
 # Secrets — never commit these
 .env
 *.keystore
