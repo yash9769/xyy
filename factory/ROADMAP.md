@@ -1,4 +1,13 @@
-# App Factory — Roadmap
+# App Factory — Roadmap (historical, Phase 0/1 planning)
+
+> **This document is historical.** It captured the Phase 0/1 plan at the very start of the
+> project, before the 30-document architecture series existed. Its phase numbers (0–7) do not
+> match `factory/docs/29-ROADMAP.md`'s (0–10), and the two were never reconciled against each
+> other. **`factory/docs/30-PHASE-IMPLEMENTATION-PLAN.md` is the authoritative implementation
+> plan going forward** — it is the one document that was written against, and cross-checked for
+> accuracy against, the actual repository as it exists today. Treat this file as a record of what
+> Phase 0/1 originally intended, useful for context on why the dashboard/state-machine/CLI look
+> the way they do, not as the current source of truth for what comes next.
 
 Guiding rule: build the smallest useful version of each phase, use it, then expand. Do not build Phase N+1 tooling before Phase N is proven on at least one real opportunity.
 

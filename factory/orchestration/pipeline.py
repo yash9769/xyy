@@ -5,6 +5,12 @@ As of the dashboard introduction, `discover`/`approve`/`reject`/`status` are thi
 machine and file I/O (see factory/dashboard/lib/stateMachine.js). This file must NOT reimplement
 that logic; if you need a new state-mutating command, add it to cli.js first, then call it from
 here. This keeps the CLI and the dashboard from ever disagreeing about what a legal transition is.
+
+`cmd_approve`/`cmd_reject` shell out to cli.js's `human-transition` command, not `transition`.
+That command requires a live interactive confirmation read from the controlling terminal
+(/dev/tty) inside the Node process itself — independent of this process's captured stdout/stderr
+below — so `appfactory approve`/`reject` only succeeds when a real person is running this command
+at a real terminal, not when invoked by a script or an automated agent process.
 """
 from __future__ import annotations
 
@@ -76,9 +82,12 @@ def cmd_analyze(opp_id: str) -> str:
 
 
 def cmd_approve(opp_id: str) -> str:
-    """GATE 1 — human approval. Equivalent to clicking Approve in the dashboard."""
+    """GATE 1 — human approval. Equivalent to clicking Approve in the dashboard.
+
+    Requires an interactive confirmation at the real terminal (see module docstring) — this will
+    fail with a clear error if run from a script or a non-interactive/automated process."""
     try:
-        data = _run_bridge("transition", opp_id, "APPROVE_OPPORTUNITY", "--actor", "HUMAN")
+        data = _run_bridge("human-transition", opp_id, "APPROVE_OPPORTUNITY")
     except RuntimeError as e:
         return f"Error: {e}"
     return f"GATE 1 passed: '{opp_id}' is now {data['opportunity']['lifecycle_state']}."
@@ -86,10 +95,7 @@ def cmd_approve(opp_id: str) -> str:
 
 def cmd_reject(opp_id: str, reason: str) -> str:
     try:
-        data = _run_bridge(
-            "transition", opp_id, "REJECT_OPPORTUNITY",
-            "--actor", "HUMAN", "--note", reason,
-        )
+        data = _run_bridge("human-transition", opp_id, "REJECT_OPPORTUNITY", "--note", reason)
     except RuntimeError as e:
         return f"Error: {e}"
     return f"'{opp_id}' rejected (state={data['opportunity']['lifecycle_state']})."

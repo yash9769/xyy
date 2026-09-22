@@ -4,7 +4,8 @@
   "private": true,
   "description": "App Factory control plane — dashboard and shared service layer over the file-based factory state.",
   "scripts": {
-    "dashboard": "node factory/dashboard/server.js"
+    "dashboard": "node factory/dashboard/server.js",
+    "test": "node --test factory/dashboard/lib/*.test.js"
   },
   "engines": {
     "node": ">=18"

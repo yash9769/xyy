@@ -10,8 +10,17 @@
  *
  * Usage:
  *   node cli.js discover --problem "..." --category "..." --target-user "..."
- *   node cli.js transition <id> <action> --actor HUMAN [--reason weak_demand] [--note "..."]
+ *   node cli.js transition <id> <action> [--actor AGENT|SYSTEM] [--reason ...] [--note "..."]
+ *   node cli.js human-transition <id> <action> [--reason weak_demand] [--note "..."]
  *   node cli.js status [id]
+ *
+ * `transition` is for AGENT/SYSTEM-actor steps only — it refuses actor=HUMAN outright, because a
+ * freely supplied --actor flag is not proof that a human is present. `human-transition` is the
+ * dedicated path for HUMAN-only approval gates: it always requires a live interactive
+ * confirmation read directly from the controlling terminal (/dev/tty), independent of this
+ * process's stdin/stdout (so it still works when a parent process, e.g. appfactory.py, captures
+ * this process's stdio). A script, subprocess, or agent with no controlling terminal cannot pass
+ * this check.
  *
  * Every command prints a single JSON object to stdout and exits 0 on success, or prints
  * {"error": "..."} and exits 1 on failure — appfactory.py parses this rather than screen-scraping
@@ -98,7 +107,14 @@ function cmdDiscover(flags) {
 function cmdTransition(positional, flags) {
   const [id, action] = positional;
   if (!id || !action) return fail('transition requires <id> <action>');
-  const actor = flags.actor || 'HUMAN';
+  const actor = flags.actor || 'AGENT';
+  if (actor === 'HUMAN') {
+    return fail(
+      "'transition' cannot be used with --actor HUMAN — a freely supplied --actor flag is not " +
+      "proof that a human is present. Use `node cli.js human-transition <id> <action>` instead, " +
+      "which requires live interactive confirmation at the controlling terminal.",
+    );
+  }
   try {
     const result = store.transition({
       id,
@@ -107,6 +123,74 @@ function cmdTransition(positional, flags) {
       reason: flags.reason,
       note: flags.note,
       actorName: flags['actor-name'],
+    });
+    ok(result);
+  } catch (e) {
+    fail(e.message);
+  }
+}
+
+/**
+ * Reads a confirmation line directly from the controlling terminal (/dev/tty), independent of
+ * this process's stdin/stdout. If no controlling terminal is attached — the case for a script,
+ * subprocess with captured/redirected stdio, or an automated agent process — opening /dev/tty
+ * fails and this throws, so there is no way to satisfy this check without a real person typing at
+ * a real terminal. This is the "local interactive confirmation mechanism" that stands in for
+ * human identity; it deliberately does not accept anything supplied as a command-line argument.
+ */
+function confirmHumanAtTerminal(promptText) {
+  let ttyFd;
+  try {
+    ttyFd = fs.openSync('/dev/tty', 'r+');
+  } catch (e) {
+    throw new Error(
+      'HUMAN approval requires an interactive controlling terminal (/dev/tty unavailable: ' +
+      `${e.code || e.message}). This action cannot be approved by a non-interactive process, ` +
+      'script, or automated agent — run this command yourself in a real terminal.',
+    );
+  }
+  try {
+    fs.writeSync(ttyFd, promptText);
+    const buf = Buffer.alloc(4096);
+    const bytesRead = fs.readSync(ttyFd, buf, 0, buf.length, null);
+    return buf.toString('utf8', 0, bytesRead).trim();
+  } finally {
+    fs.closeSync(ttyFd);
+  }
+}
+
+function cmdHumanTransition(positional, flags) {
+  const [id, action] = positional;
+  if (!id || !action) return fail('human-transition requires <id> <action>');
+
+  let typed;
+  try {
+    typed = confirmHumanAtTerminal(
+      `=== HUMAN APPROVAL REQUIRED ===\n` +
+      `Opportunity: ${id}\n` +
+      `Action: ${action}\n` +
+      `This action requires a HUMAN decision (see factory/dashboard/lib/stateMachine.js).\n` +
+      `Type the opportunity id exactly (${id}) and press Enter to confirm you are a human ` +
+      `operator performing this action interactively, or press Enter alone to abort: `,
+    );
+  } catch (e) {
+    return fail(e.message);
+  }
+  if (typed !== id) {
+    return fail(
+      `Human confirmation failed: expected the opportunity id '${id}' to be typed back, got ` +
+      `${JSON.stringify(typed)}. Transition NOT performed.`,
+    );
+  }
+
+  try {
+    const result = store.transition({
+      id,
+      action,
+      actor: 'HUMAN',
+      reason: flags.reason,
+      note: flags.note,
+      actorName: flags['actor-name'] || 'owner (cli, /dev/tty confirmed)',
     });
     ok(result);
   } catch (e) {
@@ -133,6 +217,8 @@ function main() {
       return cmdDiscover(flags);
     case 'transition':
       return cmdTransition(positional, flags);
+    case 'human-transition':
+      return cmdHumanTransition(positional, flags);
     case 'status':
       return cmdStatus(positional);
     case 'actions': {
@@ -142,7 +228,7 @@ function main() {
       return ok({ id, lifecycle_state: opp.lifecycle_state, availableActions: stateMachine.actionsFrom(opp.lifecycle_state) });
     }
     default:
-      return fail(`Unknown command '${command}'. Expected: discover, transition, status, actions`);
+      return fail(`Unknown command '${command}'. Expected: discover, transition, human-transition, status, actions`);
   }
 }
 
