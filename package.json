@@ -5,7 +5,7 @@
   "description": "App Factory control plane — dashboard and shared service layer over the file-based factory state.",
   "scripts": {
     "dashboard": "node factory/dashboard/server.js",
-    "test": "node --test factory/dashboard/lib/*.test.js"
+    "test": "node --test factory/dashboard/lib/*.test.js factory/dashboard/lib/agent/*.test.js"
   },
   "engines": {
     "node": ">=18"
