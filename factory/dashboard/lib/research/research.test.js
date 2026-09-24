@@ -48,10 +48,27 @@ function noopRecorders() {
   return { persistAgentRun: () => {}, persistToolExecution: () => {}, persistModelRun: () => {}, appendAudit: () => {} };
 }
 
-function buildToolRuntime({ searchImpl, fetchImpl } = {}) {
+// A fake resolveImpl standing in for real DNS — browser.fetch's SSRF check runs on every request
+// regardless of which fetchImpl serves it, so this keeps the whole suite offline even though it
+// uses ordinary https://example.com/... URLs throughout.
+async function fakePublicResolveImpl() {
+  return [{ address: '93.184.216.34', family: 4 }];
+}
+
+/** A canned, instant, local fetchImpl — the default whenever a test doesn't care about fetch
+ * behavior specifically. Without this, research-agent's own pipeline (which calls browser.fetch
+ * whenever a search result has a URL) would fall through to the real default implementation and
+ * attempt a genuine network request on every test that doesn't explicitly override fetchImpl —
+ * previously tolerated only because a failed fetch is treated as non-fatal by research-agent, not
+ * because it was actually offline. */
+async function defaultFakeFetchImpl(url) {
+  return { url, final_url: url, title: null, retrieved_at: new Date().toISOString(), content: 'fake fetched content', content_type: 'text/plain', http_status: 200 };
+}
+
+function buildToolRuntime({ searchImpl, fetchImpl = defaultFakeFetchImpl } = {}) {
   const registry = new ToolRegistry();
   registry.register(createBrowserSearchTool({ searchImpl }));
-  registry.register(createBrowserFetchTool(fetchImpl ? { fetchImpl } : {}));
+  registry.register(createBrowserFetchTool({ fetchImpl, resolveImpl: fakePublicResolveImpl }));
   return new ToolRuntime(registry, noopRecorders());
 }
 
