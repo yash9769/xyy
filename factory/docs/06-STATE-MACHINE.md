@@ -48,7 +48,7 @@ AWAITING_OPPORTUNITY_APPROVAL
     ↓
 APPROVED
     ↓
-SPECIFYING
+SPEC_GENERATING
     ↓
 AWAITING_SPEC_APPROVAL
     ↓
@@ -143,8 +143,8 @@ A rejection or research request must contain the appropriate audit information.
 APPROVED
 Opportunity has received valid human approval.
 No agent-generated approval can create this state.
-SPECIFYING
-Product specification is being generated.
+SPEC_GENERATING
+Product specification is being generated (Phase 5 ProductAgent; entered via `START_SPEC`, left via the AGENT-only `SUBMIT_SPEC_FOR_APPROVAL`).
 AWAITING_SPEC_APPROVAL
 Human review of the product specification.
 Allowed exit actor:
@@ -153,13 +153,14 @@ Allowed exit actor:
 HUMAN ONLY
 ```
 
-Possible outcomes:
+Possible outcomes (as implemented in `stateMachine.js`):
 
 ```
-BUILDING
-SPECIFYING
-REJECTED
+BUILDING   (APPROVE_SPEC, HUMAN)
+REJECTED   (REJECT_SPEC, HUMAN)
 ```
+
+There is no "revise and resubmit" outcome: `REJECT_SPEC` is terminal. A revision loop (e.g. a HUMAN-only `REQUEST_SPEC_REVISION` back to `APPROVED`) would be a state-machine change requiring its own approval; it has not been added.
 
 BUILDING
 Application source is being created or modified.
@@ -479,7 +480,7 @@ Only then may the transition occur.
 | `OPPORTUNITY_READY` | *(none — no equivalent state; implementation has `RESEARCH_COMPLETE` instead, which plays a similar "ready to submit" role but is named and positioned differently)* |
 | `AWAITING_OPPORTUNITY_APPROVAL` | `AWAITING_OPPORTUNITY_APPROVAL` — same name, reached via `RESEARCH_COMPLETE` directly rather than through `ANALYZING`/`OPPORTUNITY_READY` |
 | `APPROVED` | `APPROVED` — same |
-| `SPECIFYING` | `SPEC_GENERATING` — same role, different name |
+| `SPEC_GENERATING` (previously named `SPECIFYING` in this document) | `SPEC_GENERATING` — same; this document was aligned to the implemented name in Phase 5 |
 | `AWAITING_SPEC_APPROVAL` | `AWAITING_SPEC_APPROVAL` — same |
 | `BUILDING` | `BUILDING` — same |
 | `TESTING` | `TESTING` — same |

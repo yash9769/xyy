@@ -1,0 +1,188 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/yash9769/xyy/schemas/product-specification.schema.json",
+  "title": "Product Specification",
+  "description": "A versioned, immutable, evidence-traceable product specification produced by the Phase 5 ProductAgent from an APPROVED opportunity. Persisted append-only in factory/state/product/product-specifications.jsonl. Structural validation only — semantic, evidence, referential, security and governance rules are enforced deterministically in factory/dashboard/lib/product/validation.js.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "specification_id", "opportunity_id", "research_id", "analysis_id", "version", "schema_version",
+    "problem_statement", "target_users", "user_context", "jobs_to_be_done", "pain_points",
+    "product_name", "value_proposition", "positioning", "core_user_flow",
+    "mvp_features", "post_mvp_features", "non_goals",
+    "functional_requirements", "non_functional_requirements", "ux_requirements", "accessibility_requirements", "localization_requirements",
+    "platform", "minimum_os_version", "architecture_constraints", "offline_online_requirement", "storage_requirement", "external_services", "permissions",
+    "authentication_requirement", "authorization_requirement", "data_classification", "privacy_requirements", "security_requirements", "secrets_requirement", "abuse_cases", "logging_telemetry_policy", "data_retention_policy",
+    "acceptance_criteria", "test_requirements", "performance_requirements", "reliability_requirements",
+    "monetization_assumption", "success_metrics", "guardrail_metrics",
+    "supporting_research_ids", "supporting_evidence_ids",
+    "agent_metadata", "created_at", "specification_status", "disclaimer"
+  ],
+  "properties": {
+    "specification_id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*-spec-v[1-9][0-9]*$" },
+    "opportunity_id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "research_id": { "$ref": "#/definitions/NonEmptyString" },
+    "analysis_id": { "$ref": "#/definitions/NonEmptyString" },
+    "version": { "type": "integer", "minimum": 1 },
+    "schema_version": { "type": "string", "enum": ["1.0.0"] },
+
+    "problem_statement": { "$ref": "#/definitions/Claim" },
+    "target_users": { "$ref": "#/definitions/NonEmptyStringList" },
+    "user_context": { "$ref": "#/definitions/NonEmptyString" },
+    "jobs_to_be_done": { "$ref": "#/definitions/NonEmptyClaimList" },
+    "pain_points": { "$ref": "#/definitions/NonEmptyClaimList" },
+
+    "product_name": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "value_proposition": { "$ref": "#/definitions/Claim" },
+    "positioning": { "$ref": "#/definitions/NonEmptyString" },
+    "core_user_flow": { "$ref": "#/definitions/NonEmptyStringList" },
+
+    "mvp_features": { "type": "array", "minItems": 1, "maxItems": 8, "items": { "$ref": "#/definitions/Feature" } },
+    "post_mvp_features": { "type": "array", "maxItems": 10, "items": { "$ref": "#/definitions/Feature" } },
+    "non_goals": { "$ref": "#/definitions/StringList" },
+
+    "functional_requirements": { "type": "array", "minItems": 1, "maxItems": 25, "items": { "$ref": "#/definitions/Requirement" } },
+    "non_functional_requirements": { "type": "array", "maxItems": 15, "items": { "$ref": "#/definitions/Requirement" } },
+    "ux_requirements": { "$ref": "#/definitions/ClaimList" },
+    "accessibility_requirements": { "$ref": "#/definitions/ClaimList" },
+    "localization_requirements": { "$ref": "#/definitions/ClaimList" },
+
+    "platform": { "type": "string", "enum": ["android"] },
+    "minimum_os_version": { "type": ["string", "null"], "pattern": "^[1-9][0-9]*$" },
+    "architecture_constraints": { "$ref": "#/definitions/ClaimList" },
+    "offline_online_requirement": { "$ref": "#/definitions/Claim" },
+    "storage_requirement": { "$ref": "#/definitions/Claim" },
+    "external_services": { "type": "array", "maxItems": 10, "items": { "$ref": "#/definitions/ExternalService" } },
+    "permissions": { "type": "array", "maxItems": 20, "items": { "$ref": "#/definitions/Permission" } },
+
+    "authentication_requirement": { "$ref": "#/definitions/Claim" },
+    "authorization_requirement": { "$ref": "#/definitions/Claim" },
+    "data_classification": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/definitions/DataClassification" }
+    },
+    "privacy_requirements": { "$ref": "#/definitions/ClaimList" },
+    "security_requirements": { "$ref": "#/definitions/ClaimList" },
+    "secrets_requirement": { "$ref": "#/definitions/Claim" },
+    "abuse_cases": { "$ref": "#/definitions/StringList" },
+    "logging_telemetry_policy": { "$ref": "#/definitions/Claim" },
+    "data_retention_policy": { "$ref": "#/definitions/Claim" },
+
+    "acceptance_criteria": { "type": "array", "minItems": 1, "maxItems": 40, "items": { "$ref": "#/definitions/AcceptanceCriterion" } },
+    "test_requirements": { "$ref": "#/definitions/ClaimList" },
+    "performance_requirements": { "$ref": "#/definitions/ClaimList" },
+    "reliability_requirements": { "$ref": "#/definitions/ClaimList" },
+
+    "monetization_assumption": { "$ref": "#/definitions/Claim" },
+    "success_metrics": { "type": "array", "minItems": 1, "maxItems": 10, "items": { "$ref": "#/definitions/Metric" } },
+    "guardrail_metrics": { "type": "array", "maxItems": 10, "items": { "$ref": "#/definitions/Metric" } },
+
+    "supporting_research_ids": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/NonEmptyString" } },
+    "supporting_evidence_ids": { "type": "array", "items": { "$ref": "#/definitions/NonEmptyString" } },
+
+    "agent_metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["actor", "agent_id", "agent_version", "run_id", "model_request_id", "model_id", "provider_id"],
+      "properties": {
+        "actor": { "type": "string", "enum": ["AGENT"] },
+        "agent_id": { "$ref": "#/definitions/NonEmptyString" },
+        "agent_version": { "$ref": "#/definitions/NonEmptyString" },
+        "run_id": { "$ref": "#/definitions/NonEmptyString" },
+        "model_request_id": { "type": ["string", "null"] },
+        "model_id": { "type": ["string", "null"] },
+        "provider_id": { "type": ["string", "null"] }
+      }
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "specification_status": { "type": "string", "enum": ["DRAFT"] },
+    "disclaimer": { "$ref": "#/definitions/NonEmptyString" }
+  },
+  "definitions": {
+    "NonEmptyString": { "type": "string", "minLength": 1, "maxLength": 2000 },
+    "Identifier": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$" },
+    "StringList": { "type": "array", "maxItems": 30, "items": { "$ref": "#/definitions/NonEmptyString" } },
+    "NonEmptyStringList": { "type": "array", "minItems": 1, "maxItems": 30, "items": { "$ref": "#/definitions/NonEmptyString" } },
+    "ClaimList": { "type": "array", "maxItems": 20, "items": { "$ref": "#/definitions/Claim" } },
+    "NonEmptyClaimList": { "type": "array", "minItems": 1, "maxItems": 20, "items": { "$ref": "#/definitions/Claim" } },
+    "EvidenceIdList": { "type": "array", "maxItems": 20, "items": { "type": "string", "minLength": 1, "maxLength": 200 } },
+    "DataClassification": {
+      "type": "string",
+      "enum": ["NONE", "PUBLIC", "INTERNAL", "PERSONAL", "SENSITIVE_PERSONAL", "FINANCIAL", "HEALTH", "PRECISE_LOCATION", "CREDENTIALS"]
+    },
+    "Claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["statement", "claim_type", "evidence_ids"],
+      "properties": {
+        "statement": { "$ref": "#/definitions/NonEmptyString" },
+        "claim_type": { "type": "string", "enum": ["FACT", "INFERENCE", "HYPOTHESIS", "PRODUCT_DECISION", "SYSTEM_CONSTRAINT"] },
+        "evidence_ids": { "$ref": "#/definitions/EvidenceIdList" },
+        "constraint_source": { "type": ["string", "null"], "maxLength": 200 },
+        "rationale": { "type": ["string", "null"], "maxLength": 2000 },
+        "decided_by": { "type": ["string", "null"], "maxLength": 200 }
+      }
+    },
+    "Feature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["feature_id", "claim", "linked_requirement_ids"],
+      "properties": {
+        "feature_id": { "$ref": "#/definitions/Identifier" },
+        "claim": { "$ref": "#/definitions/Claim" },
+        "linked_requirement_ids": { "type": "array", "maxItems": 25, "items": { "$ref": "#/definitions/Identifier" } }
+      }
+    },
+    "Requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requirement_id", "claim", "linked_feature_id"],
+      "properties": {
+        "requirement_id": { "$ref": "#/definitions/Identifier" },
+        "claim": { "$ref": "#/definitions/Claim" },
+        "linked_feature_id": { "type": ["string", "null"], "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$" }
+      }
+    },
+    "AcceptanceCriterion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["criterion_id", "statement", "requirement_ids"],
+      "properties": {
+        "criterion_id": { "$ref": "#/definitions/Identifier" },
+        "statement": { "$ref": "#/definitions/NonEmptyString" },
+        "requirement_ids": { "type": "array", "minItems": 1, "maxItems": 25, "items": { "$ref": "#/definitions/Identifier" } }
+      }
+    },
+    "ExternalService": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "purpose", "justification", "data_shared_classification"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "purpose": { "$ref": "#/definitions/NonEmptyString" },
+        "justification": { "$ref": "#/definitions/NonEmptyString" },
+        "data_shared_classification": { "$ref": "#/definitions/DataClassification" }
+      }
+    },
+    "Permission": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["android_permission", "justification", "data_accessed_classification"],
+      "properties": {
+        "android_permission": { "type": "string", "pattern": "^android\\.permission\\.[A-Z][A-Z0-9_]*$" },
+        "justification": { "$ref": "#/definitions/NonEmptyString" },
+        "data_accessed_classification": { "$ref": "#/definitions/DataClassification" }
+      }
+    },
+    "Metric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metric", "target", "evidence_ids"],
+      "properties": {
+        "metric": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "target": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "evidence_ids": { "$ref": "#/definitions/EvidenceIdList" }
+      }
+    }
+  }
+}

@@ -183,6 +183,8 @@ The resulting specification is:
 * testable;
 * reviewable by a human.
 
+Implementation status (Phase 5): implemented as a single ProductAgent (`factory/dashboard/lib/agent/agents/productAgent.js`) plus `factory/dashboard/lib/product/`, with the schema in `schemas/product-specification.schema.json`. UX and architecture are sections of the one specification (`ux_requirements`, `architecture_constraints`), not separate agents. The work ends at `AWAITING_SPEC_APPROVAL`. See `factory/dashboard/lib/product/README.md` for claim semantics, validation, versioning, the approval boundary and known limitations.
+
 Phase 6 — Coding Factory
 Objective
 Implement applications in isolated workspaces.

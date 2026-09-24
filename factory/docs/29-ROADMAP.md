@@ -26,16 +26,20 @@ The factory should evolve through these major phases:
 ```text
 Phase 0 — Foundation
 Phase 1 — Agent Runtime
-Phase 2 — Research Factory
-Phase 3 — Product Factory
-Phase 4 — Coding Factory
-Phase 5 — Verification & Security
-Phase 6 — Release Factory
-Phase 7 — Distribution Factory
-Phase 8 — Analytics & Monitoring
-Phase 9 — Autonomous Iteration
-Phase 10 — Reliability & Hardening
+Phase 2 — Model Router
+Phase 3 — Tool Runtime
+Phase 4 — Research Factory
+Phase 5 — Product Factory
+Phase 6 — Coding Factory
+Phase 7 — Verification & Security
+Phase 8 — Release Factory
+Phase 9 — Distribution Factory
+Phase 10 — Analytics & Monitoring
+Phase 11 — Autonomous Iteration
+Phase 12 — Reliability & Hardening
 ```
+
+This numbering matches `30-PHASE-IMPLEMENTATION-PLAN.md`, which is the numbering the implementation has actually followed (Phases 1–5 as built). Phases 2 (Model Router) and 3 (Tool Runtime) are defined in that document; the sections below keep their original order.
 
 4. Phase 0 — Foundation
 Objective
@@ -74,7 +78,7 @@ Build:
 Do not yet automate the complete app lifecycle.
 Exit Criteria
 At least one agent can execute through the formal runtime and produce validated structured output.
-6. Phase 2 — Research Factory
+6. Phase 4 — Research Factory (after Phase 2 Model Router and Phase 3 Tool Runtime)
 Objective
 Automate opportunity discovery and research.
 Build:
@@ -89,7 +93,7 @@ Build:
 Human approval remains mandatory.
 Exit Criteria
 The factory can produce a research-backed opportunity package without automatically approving it.
-7. Phase 3 — Product Factory
+7. Phase 5 — Product Factory
 Objective
 Convert approved opportunities into implementable product specifications.
 Build:
@@ -103,7 +107,7 @@ Build:
 
 Exit Criteria
 An approved opportunity produces a versioned product specification ready for implementation.
-8. Phase 4 — Coding Factory
+8. Phase 6 — Coding Factory
 Objective
 Automate controlled application implementation.
 Build:
@@ -118,7 +122,7 @@ Build:
 
 Exit Criteria
 The factory can implement a bounded application change, build it, test it, and produce evidence without unrestricted host access.
-9. Phase 5 — Verification & Security
+9. Phase 7 — Verification & Security
 Objective
 Make verification a first-class automated pipeline.
 Build:
@@ -134,7 +138,7 @@ Build:
 
 Exit Criteria
 A release candidate cannot progress without required verification evidence.
-10. Phase 6 — Release Factory
+10. Phase 8 — Release Factory
 Objective
 Automate release preparation while preserving human control over publication.
 Build:
@@ -148,7 +152,7 @@ Build:
 
 Exit Criteria
 A human can review a complete release candidate and explicitly authorize publication.
-11. Phase 7 — Distribution Factory
+11. Phase 9 — Distribution Factory
 Objective
 Automate controlled user acquisition workflows.
 Build:
@@ -162,7 +166,7 @@ Build:
 
 Exit Criteria
 The factory can prepare measurable distribution experiments while respecting financial and platform controls.
-12. Phase 8 — Analytics & Monitoring
+12. Phase 10 — Analytics & Monitoring
 Objective
 Create the feedback loop after launch.
 Build:
@@ -176,7 +180,7 @@ Build:
 
 Exit Criteria
 The factory can identify meaningful changes in application behavior using real evidence.
-13. Phase 9 — Autonomous Iteration
+13. Phase 11 — Autonomous Iteration
 Objective
 Allow the factory to propose and execute bounded improvements.
 Target loop:
@@ -202,7 +206,7 @@ MEASURE
 ```
 
 The system must not optimize blindly.
-14. Phase 10 — Reliability & Hardening
+14. Phase 12 — Reliability & Hardening
 Objective
 Make the factory reliable enough for continuous operation.
 Build:
@@ -375,6 +379,8 @@ This document asks explicitly (via the Batch 10 instructions) that its Phase 0 b
 ### Phase strategy (§3) vs. `factory/ROADMAP.md`'s existing phase numbering — a naming collision worth flagging, not resolving here
 
 This repository already has a `factory/ROADMAP.md` (written during Phase 0 of the original factory build, before this documentation series began) with its own Phase 0–7 numbering (Architecture, Working Local MVP, Automated Research, Automated App Generation, Automated QA/Security, Play Store Automation, Monitoring/Analytics, Multi-App Scaling). This document's §3 introduces a **different** Phase 0–10 numbering (Foundation, Agent Runtime, Research Factory, Product Factory, Coding Factory, Verification & Security, Release Factory, Distribution Factory, Analytics & Monitoring, Autonomous Iteration, Reliability & Hardening) that does not map one-to-one onto the original. For example, the original roadmap's "Phase 2 — Automated research" and this document's "Phase 2 — Research Factory" cover similar ground but sit at different points in each document's own sequence, and the original's "Phase 1 — Working local MVP" (Hisaab) corresponds to *part of* this document's "Phase 0 — Foundation," not a separate phase. **This is a real naming collision between two roadmap documents in the same repository, not resolved by this reconciliation** — per this batch's own instruction not to invent resolutions, both documents are left as-is, and a future pass should either retire `factory/ROADMAP.md` in favor of this document's numbering or explicitly cross-reference the two.
+
+**Update (Phase 5):** the paragraph above describes this document's original Phase 0–10 list. That list also disagreed with `30-PHASE-IMPLEMENTATION-PLAN.md` (which inserts Model Router and Tool Runtime as Phases 2 and 3, making Research Factory Phase 4 and Product Factory Phase 5). §3 and the phase section headings have been renumbered to match `30-PHASE-IMPLEMENTATION-PLAN.md`, the numbering the implementation actually follows. The separate collision with the older `factory/ROADMAP.md` remains unresolved.
 
 ### §5–§14 (Phases 1–10) — not reconciled individually here
 
